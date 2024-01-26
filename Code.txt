@@ -1,0 +1,281 @@
+// Behavioural verilog code for 32-bit upcounter
+
+module up_down_counter (clk,rst,counter, clkout, HEX0, up, HEX1, HEX2, HEX3, HEX4, HEX5, HEX6, HEX7, ctrl);
+
+input clk,rst;
+input up, ctrl;
+output [31:0] counter;
+output [6:0] HEX0, HEX1, HEX2, HEX3, HEX4, HEX5, HEX6, HEX7;
+wire w1;
+output clkout;
+
+clkdiv c1 (.clkin(clk), .rst(rst) , .clkout (w1));
+counter c2 (.clk(w1), .rst(rst), .counter(counter), .up(up), .ctrl(ctrl));
+BCD1 c3(.HEX0(HEX0), .SW(counter[3:0]));
+BCD1 c4(.HEX0(HEX1), .SW(counter[7:4]));
+BCD1 c5(.HEX0(HEX2), .SW(counter[11:8]));
+BCD1 c6(.HEX0(HEX3), .SW(counter[15:12]));
+BCD1 c7(.HEX0(HEX4), .SW(counter[19:16]));
+BCD1 c8(.HEX0(HEX5), .SW(counter[23:20]));
+BCD1 c9(.HEX0(HEX6), .SW(counter[27:24]));
+BCD1 c10(.HEX0(HEX7), .SW(counter[31:28]));
+assign clkout=w1;
+endmodule
+
+
+
+
+module counter (
+  input wire clk, rst,
+  input wire up, ctrl,// User-defined input: 1 for up, 0 for down
+  output reg [31:0] counter
+);
+
+  always @(posedge clk or posedge rst) begin
+    if (rst) begin
+      counter <= 32'b0; // Reset the counter to 0 on a positive edge of the reset signal
+    end
+    else begin
+      if (up == 1'b1) begin
+		if(ctrl == 1'b1)
+		begin
+		counter <= counter;
+		end
+		else if (counter != 32'hFFFFFFFF) begin
+          counter <= counter + 1; // Increment the counter if counting up and not at the maximum value
+        end
+        else begin
+          counter <= 32'b0; // Wrap-around to 0 if counting up and reaching the maximum value
+        end
+      end
+      else begin
+        if(up == 1'b0)
+	begin
+	if(ctrl == 1'b1)
+	begin
+	counter <= counter;
+	end
+	else
+	if (counter != 32'b0) begin
+          counter <= counter - 1; // Decrement the counter if counting down and not at 0
+        end
+        else if (up == 1'b0) begin
+          counter <= counter - 1;
+        end
+        else begin
+          counter <= counter; // Wrap-around to maximum if counting down and reaching 0
+        end
+      end
+    end
+  end
+end
+endmodule
+
+
+// Clock divider for 1 second output for LED
+module clkdiv (clkin, rst , clkout);
+input clkin,rst;
+output clkout;
+reg clkout;
+reg [25:0] clkdiv;
+always @ (posedge clkin)
+begin
+if (clkdiv == 26'b10_1111_1010_1111_0000_1000_0000)
+ begin 
+  if (rst)
+  begin  
+    clkout<=1'b0;
+	end
+  else
+  begin
+   clkout <= ~clkout;
+   clkdiv<=26'b0;
+    end
+  end
+else
+clkdiv <= clkdiv + 1'b1;
+end
+endmodule
+
+ // Seven Segment Display
+ 
+module BCD1(HEX0,SW, HEX1, HEX2, HEX3, HEX4, HEX5, HEX6, HEX7);
+input [31:0]SW;
+output reg [6:0] HEX0,HEX1, HEX2, HEX3, HEX4, HEX5, HEX6, HEX7;
+// seg = {g,f,e,d,c,b,a};
+// 0 is on and 1 is off
+
+always @ (SW)
+case (SW)
+		32'h0: HEX0 = 7'b1000000;
+		32'h1: HEX0 = 7'b1111001; 	// ---a----
+		32'h2: HEX0=  7'b0100100; 	// |	  |
+		32'h3: HEX0 = 7'b0110000; 	// f	  b
+		32'h4: HEX0 = 7'b0011001; 	// |	  |
+		32'h5: HEX0 = 7'b0010010; 	// ---g----
+		32'h6: HEX0 = 7'b0000010; 	// |	  |
+		32'h7: HEX0 = 7'b1111000; 	// e	  c
+		32'h8: HEX0 = 7'b0000000; 	// |	  |
+		32'h9: HEX0 = 7'b0011000; 	// ---d----
+		32'ha: HEX0 = 7'b0001000;
+		32'hb: HEX0 = 7'b0000011;
+		32'hc: HEX0 = 7'b1000110;
+		32'hd: HEX0 = 7'b0100001;
+		32'he: HEX0 = 7'b0000110;
+		32'hf: HEX0 = 7'b0001110;
+		
+		32'h0: HEX1 = 7'b1000000;
+		32'h1: HEX1 = 7'b1111001; 	// ---a----
+		32'h2: HEX1=  7'b0100100; 	// |	  |
+		32'h3: HEX1 = 7'b0110000; 	// f	  b
+		32'h4: HEX1 = 7'b0011001; 	// |	  |
+		32'h5: HEX1 = 7'b0010010; 	// ---g----
+		32'h6: HEX1 = 7'b0000010; 	// |	  |
+		32'h7: HEX1 = 7'b1111000; 	// e	  c
+		32'h8: HEX1 = 7'b0000000; 	// |	  |
+		32'h9: HEX1 = 7'b0011000; 	// ---d----
+		32'ha: HEX1 = 7'b0001000;
+		32'hb: HEX1 = 7'b0000011;
+		32'hc: HEX1 = 7'b1000110;
+		32'hd: HEX1 = 7'b0100001;
+		32'he: HEX1 = 7'b0000110;
+		32'hf: HEX1 = 7'b0001110;
+		
+		32'h0: HEX2 = 7'b1000000;
+		32'h1: HEX2 = 7'b1111001; 	// ---a----
+		32'h2: HEX2=  7'b0100100; 	// |	  |
+		32'h3: HEX2 = 7'b0110000; 	// f	  b
+		32'h4: HEX2 = 7'b0011001; 	// |	  |
+		32'h5: HEX2 = 7'b0010010; 	// ---g----
+		32'h6: HEX2 = 7'b0000010; 	// |	  |
+		32'h7: HEX2 = 7'b1111000; 	// e	  c
+		32'h8: HEX2 = 7'b0000000; 	// |	  |
+		32'h9: HEX2 = 7'b0011000; 	// ---d----
+		32'ha: HEX2 = 7'b0001000;
+		32'hb: HEX2 = 7'b0000011;
+		32'hc: HEX2 = 7'b1000110;
+		32'hd: HEX2 = 7'b0100001;
+		32'he: HEX2 = 7'b0000110;
+		32'hf: HEX2 = 7'b0001110;
+		
+		32'h0: HEX3 = 7'b1000000;
+		32'h1: HEX3 = 7'b1111001; 	// ---a----
+		32'h2: HEX3 =  7'b0100100; 	// |	  |
+		32'h3: HEX3 = 7'b0110000; 	// f	  b
+		32'h4: HEX3 = 7'b0011001; 	// |	  |
+		32'h5: HEX3 = 7'b0010010; 	// ---g----
+		32'h6: HEX3 = 7'b0000010; 	// |	  |
+		32'h7: HEX3 = 7'b1111000; 	// e	  c
+		32'h8: HEX3 = 7'b0000000; 	// |	  |
+		32'h9: HEX3 = 7'b0011000; 	// ---d----
+		32'ha: HEX3 = 7'b0001000;
+		32'hb: HEX3 = 7'b0000011;
+		32'hc: HEX3 = 7'b1000110;
+		32'hd: HEX3 = 7'b0100001;
+		32'he: HEX3 = 7'b0000110;
+		32'hf: HEX3 = 7'b0001110;
+		
+		32'h0: HEX4 = 7'b1000000;
+		32'h1: HEX4 = 7'b1111001; 	// ---a----
+		32'h2: HEX4=  7'b0100100; 	// |	  |
+		32'h3: HEX4 = 7'b0110000; 	// f	  b
+		32'h4: HEX4 = 7'b0011001; 	// |	  |
+		32'h5: HEX4 = 7'b0010010; 	// ---g----
+		32'h6: HEX4 = 7'b0000010; 	// |	  |
+		32'h7: HEX4 = 7'b1111000; 	// e	  c
+		32'h8: HEX4 = 7'b0000000; 	// |	  |
+		32'h9: HEX4 = 7'b0011000; 	// ---d----
+		32'ha: HEX4 = 7'b0001000;
+		32'hb: HEX4 = 7'b0000011;
+		32'hc: HEX4 = 7'b1000110;
+		32'hd: HEX4 = 7'b0100001;
+		32'he: HEX4 = 7'b0000110;
+		32'hf: HEX4 = 7'b0001110;
+		
+		32'h0: HEX5 = 7'b1000000;
+		32'h1: HEX5 = 7'b1111001; 	// ---a----
+		32'h2: HEX5=  7'b0100100; 	// |	  |
+		32'h3: HEX5 = 7'b0110000; 	// f	  b
+		32'h4: HEX5 = 7'b0011001; 	// |	  |
+		32'h5: HEX5 = 7'b0010010; 	// ---g----
+		32'h6: HEX5 = 7'b0000010; 	// |	  |
+		32'h7: HEX5 = 7'b1111000; 	// e	  c
+		32'h8: HEX5 = 7'b0000000; 	// |	  |
+		32'h9: HEX5 = 7'b0011000; 	// ---d----
+		32'ha: HEX5 = 7'b0001000;
+		32'hb: HEX5 = 7'b0000011;
+		32'hc: HEX5 = 7'b1000110;
+		32'hd: HEX5 = 7'b0100001;
+		32'he: HEX5 = 7'b0000110;
+		32'hf: HEX5 = 7'b0001110;
+		
+		32'h0: HEX6 = 7'b1000000;
+		32'h1: HEX6 = 7'b1111001; 	// ---a----
+		32'h2: HEX6=  7'b0100100; 	// |	  |
+		32'h3: HEX6 = 7'b0110000; 	// f	  b
+		32'h4: HEX6 = 7'b0011001; 	// |	  |
+		32'h5: HEX6 = 7'b0010010; 	// ---g----
+		32'h6: HEX6 = 7'b0000010; 	// |	  |
+		32'h7: HEX6 = 7'b1111000; 	// e	  c
+		32'h8: HEX6 = 7'b0000000; 	// |	  |
+		32'h9: HEX6 = 7'b0011000; 	// ---d----
+		32'ha: HEX6 = 7'b0001000;
+		32'hb: HEX6 = 7'b0000011;
+		32'hc: HEX6 = 7'b1000110;
+		32'hd: HEX6 = 7'b0100001;
+		32'he: HEX6 = 7'b0000110;
+		32'hf: HEX6 = 7'b0001110;
+		
+		32'h0: HEX7 = 7'b1000000;
+		32'h1: HEX7 = 7'b1111001; 	// ---a----
+		32'h2: HEX7=  7'b0100100; 	// |	  |
+		32'h3: HEX7 = 7'b0110000; 	// f	  b
+		32'h4: HEX7 = 7'b0011001; 	// |	  |
+		32'h5: HEX7 = 7'b0010010; 	// ---g----
+		32'h6: HEX7 = 7'b0000010; 	// |	  |
+		32'h7: HEX7 = 7'b1111000; 	// e	  c
+		32'h8: HEX7 = 7'b0000000; 	// |	  |
+		32'h9: HEX7 = 7'b0011000; 	// ---d----
+		32'ha: HEX7 = 7'b0001000;
+		32'hb: HEX7 = 7'b0000011;
+		32'hc: HEX7 = 7'b1000110;
+		32'hd: HEX7 = 7'b0100001;
+		32'he: HEX7 = 7'b0000110;
+		32'hf: HEX7 = 7'b0001110;
+endcase
+
+endmodule
+
+
+
+
+//////////////testbench////////////
+
+
+module try_tb();
+
+  reg clk, reset;
+  wire [31:0] counter;
+  reg up;
+
+  up_down_counter uut (.clk(clk),.reset(reset),.counter(counter),.up(up));
+
+  // Clock generation
+  always #5 clk = ~clk; // Toggle the clock every 5 time units
+
+  initial begin
+    $monitor($time, " up = %b counter = %b", up, counter); // Display simulation time, up signal, and counter value
+  end
+
+  initial begin
+    reset = 1; // Initialize reset to 1
+    clk = 0;   // Initialize clock to 0
+    #10 reset = 0; // Release reset after 10 time units
+    #10 up=1;      // Set the up signal to 1 after 10 time units
+    #50 up=0;      // Set the up signal to 0 after 50 time units
+    #200 up = 1;   // Set the up signal to 1 after 200 time units
+
+    #200 $stop; // Stop simulation after a certain time
+  end
+
+endmodule

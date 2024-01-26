@@ -1,0 +1,80 @@
+m255
+K4
+z2
+!s11f vlog 2020.1 2020.02, Feb 28 2020
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+dC:/Users/Santhosh/Documents/FPGA Lab/FPGA
+vtry_tb
+!s110 1701509213
+!i10b 1
+!s100 m7Je07586748iLSJjc53_3
+Z0 !s11b Dg1SIo80bB@j0V0VzS_@n1
+IBLPGmdVeeMV5]7R@Pl5Mh3
+Z1 VDg1SIo80bB@j0V0VzS_@n1
+Z2 dC:/Users/Santhosh/Desktop/FPGA_Project/Simulation
+w1701509211
+Z3 8C:/Users/Santhosh/Desktop/FPGA_Project/Simulation/RTL_Code.v
+Z4 FC:/Users/Santhosh/Desktop/FPGA_Project/Simulation/RTL_Code.v
+!i122 0
+Z5 L0 32 27
+Z6 OV;L;2020.1;71
+r1
+!s85 0
+31
+!s108 1701509213.000000
+!s107 C:/Users/Santhosh/Desktop/FPGA_Project/Simulation/RTL_Code.v|
+Z7 !s90 -reportprogress|300|-work|work|-stats=none|C:/Users/Santhosh/Desktop/FPGA_Project/Simulation/RTL_Code.v|
+!i113 1
+Z8 o-work work
+Z9 tCvgOpt 0
+vup_down_counter
+Z10 !s110 1701509237
+!i10b 1
+!s100 <7KMbXJ`QbeO_kT?c9R?^2
+R0
+IiT<dbmoH1CIdzFlol1;cm0
+R1
+R2
+Z11 w1701509235
+R3
+R4
+!i122 1
+L0 4 26
+R6
+r1
+!s85 0
+31
+Z12 !s108 1701509237.000000
+Z13 !s107 C:/Users/Santhosh/Desktop/FPGA_Project/Simulation/RTL_Code.v|
+R7
+!i113 1
+R8
+R9
+vup_down_counter_tb
+R10
+!i10b 1
+!s100 >Ic>]g`f9g99>k8z6b[Z=1
+R0
+Ii[oQzEdZed@l3>[9anZlG0
+R1
+R2
+R11
+R3
+R4
+!i122 1
+R5
+R6
+r1
+!s85 0
+31
+R12
+R13
+R7
+!i113 1
+R8
+R9

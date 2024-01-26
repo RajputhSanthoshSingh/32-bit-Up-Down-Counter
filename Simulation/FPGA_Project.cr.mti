@@ -1,0 +1,9 @@
+C:/Users/Santhosh/Desktop/FPGA_Project/Simulation/RTL_Code.v {1 {vlog -work work -stats=none C:/Users/Santhosh/Desktop/FPGA_Project/Simulation/RTL_Code.v
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module up_down_counter
+-- Compiling module up_down_counter_tb
+
+Top level modules:
+	up_down_counter_tb
+
+} {} {}}
